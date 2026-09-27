@@ -1,0 +1,60 @@
+item,rater,label
+q001,gold,Highly Meets
+q001,asha,Highly Meets
+q001,rahul,Highly Meets
+q002,gold,Moderately Meets
+q002,asha,Slightly Meets
+q002,rahul,Moderately Meets
+q003,gold,Fails to Meet
+q003,asha,Fails to Meet
+q003,rahul,Fails to Meet
+q004,gold,Moderately Meets
+q004,asha,Slightly Meets
+q004,rahul,Slightly Meets
+q005,gold,Highly Meets
+q005,asha,Highly Meets
+q005,rahul,Moderately Meets
+q006,gold,Slightly Meets
+q006,asha,Slightly Meets
+q006,rahul,Slightly Meets
+q007,gold,Moderately Meets
+q007,asha,Slightly Meets
+q007,rahul,Moderately Meets
+q008,gold,Fails to Meet
+q008,asha,Slightly Meets
+q008,rahul,Fails to Meet
+q009,gold,Highly Meets
+q009,asha,Highly Meets
+q009,rahul,Highly Meets
+q010,gold,Moderately Meets
+q010,asha,Slightly Meets
+q010,rahul,Moderately Meets
+q011,gold,Slightly Meets
+q011,asha,Slightly Meets
+q011,rahul,Moderately Meets
+q012,gold,Fails to Meet
+q012,asha,Fails to Meet
+q012,rahul,Fails to Meet
+q013,gold,Moderately Meets
+q013,asha,Moderately Meets
+q013,rahul,Moderately Meets
+q014,gold,Highly Meets
+q014,asha,Moderately Meets
+q014,rahul,Highly Meets
+q015,gold,Slightly Meets
+q015,asha,Fails to Meet
+q015,rahul,Slightly Meets
+q016,gold,Moderately Meets
+q016,asha,Slightly Meets
+q016,rahul,Moderately Meets
+q017,gold,Highly Meets
+q017,asha,Highly Meets
+q017,rahul,Highly Meets
+q018,gold,Fails to Meet
+q018,asha,Fails to Meet
+q018,rahul,Slightly Meets
+q019,asha,Moderately Meets
+q019,rahul,Moderately Meets
+q020,gold,Slightly Meets
+q020,asha,Slightly Meets
+q020,rahul,Slightly Meets
