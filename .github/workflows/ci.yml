@@ -1,0 +1,102 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  # The README claims Python 3.8 and up, and standard library only. Both of
+  # those are claims a build can check, so it checks them: no pip install step
+  # anywhere below, and the oldest version in the matrix is the one claimed.
+  unittest:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Show what we are running on
+        run: python -VV
+
+      - name: Tests
+        run: python -m unittest discover --verbose
+
+  # Tests exercise the maths. This exercises the two things the tests cannot:
+  # that the command line front end actually runs, and that the CSV reader and
+  # the JSONL reader agree about the same twenty ratings. A reader that quietly
+  # dropped a row would still pass every unit test.
+  samples:
+    runs-on: ubuntu-latest
+    needs: unittest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Report, as a human would read it
+        run: python cli.py sample/ratings.csv --gold gold
+
+      - name: Both file formats describe the same ratings
+        run: |
+          python cli.py sample/ratings.csv               --json > from-csv.json
+          python cli.py sample/ratings.jsonl --format jsonl --json > from-jsonl.json
+          python - <<'PY'
+          import json
+
+          csv   = json.load(open('from-csv.json'))
+          jsonl = json.load(open('from-jsonl.json'))
+
+          if csv != jsonl:
+              raise SystemExit('the CSV and JSONL samples hold the same ratings, '
+                               'but the two reports differ')
+
+          # Hard-coded so that a change in the maths has to be deliberate. If
+          # you meant to change it, change the number here and say why.
+          expected_fleiss = 0.4796680497925312
+          if csv['fleiss_kappa'] != expected_fleiss:
+              raise SystemExit('Fleiss kappa is %r, expected %r'
+                               % (csv['fleiss_kappa'], expected_fleiss))
+
+          if csv['items'] != 20 or csv['items_rated_by_everyone'] != 19:
+              raise SystemExit('the sample should be 20 items with 19 rated by '
+                               'everyone, got %r and %r'
+                               % (csv['items'], csv['items_rated_by_everyone']))
+
+          # The pair the sample was built to show: two raters who look fine on
+          # the headline number and still disagree on one label boundary.
+          pair = [p for p in csv['pairs'] if p['raters'] == ['gold', 'rahul']][0]
+          if pair['worst_boundary'] is None:
+              raise SystemExit('gold vs rahul should name a worst boundary')
+
+          print('csv and jsonl agree; fleiss kappa %.4f; gold vs rahul worst '
+                'boundary %s' % (csv['fleiss_kappa'], pair['worst_boundary']))
+          PY
+
+      - name: A file with nothing in it is an error, not a crash
+        run: |
+          : > empty.csv
+          set +e
+          python cli.py empty.csv > out.txt 2>&1
+          code=$?
+          set -e
+          cat out.txt
+          if [ "$code" -eq 0 ]; then
+            echo "an empty file should not be a success"
+            exit 1
+          fi
+          if grep -qi 'Traceback' out.txt; then
+            echo "an empty file should be reported, not raised"
+            exit 1
+          fi
